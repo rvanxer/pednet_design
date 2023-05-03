@@ -1,49 +1,47 @@
-# Import mobilkit and its namespace including commonly used packages
-from mobilkit.umni import *
-
 from igraph import Graph
+import geopandas as gpd
+import numpy as np
+import pandas as pd
 
-# import sys
-# sys.path.insert(0, '/home/umni2/a/umnilab/users/verma99/mk/mobilkit')
-# from mobilkit.umni import *
+from mobilkit.umni import Project
+import mobilkit.utils as U
+from mobilkit.geo import CRS_DEG
 
 P = Project('..')
 
 class City:
-    def __init__(self, geocode, name=None, root=P.data, load=()):
+    def __init__(self, geocode, name=None, root=P.data):
         self.geocode = geocode
         self.name = name if isinstance(name, str) else geocode.split(',')[0]
         self.label = self.name.lower().replace(' ', '_')
-        self.root = U.mkdir(f'{root}/{self.label}/')
-        layers = [load] if isinstance(load, str) else load
-        for layer in layers:
-            self.load(layer)
+        self.root = U.mkdir(f'{root}/{self.label}')
 
     def __repr__(self):
         return f'City({self.name})'
 
-    def load(self, layer, crs=None):
+    def load(self, layer, crs=CRS_DEG):
         if hasattr(self, layer):
             return getattr(self, layer)
-        df = pd.read_pickle(self.root + layer + '.pickle')
-        if crs is not None:
-            df = df.to_crs(crs)
+        df = pd.read_parquet(self.root / f'{layer}.parquet')
+        if 'geometry' in df.columns:
+            geom = gpd.GeoSeries.from_wkb(df.geometry)
+            df = gpd.GeoDataFrame(df, geometry=geom, crs=crs)
         setattr(self, layer, df)
         return df
 
     def save(self, fname, df):
         setattr(self, fname, df)
-        df.to_pickle(self.root + fname + '.pickle')
+        df.to_parquet(self.root / f'{fname}.parquet')
 
 
 class Pednet:
-    def __init__(self, city, query=None, name='', od_fname='', E=None):
+    def __init__(self, city, query=None, name='', od_sample_id='', E=None):
         # load prepared data for this city
         V = city.load('full_pednet_nodes')
         if E is None:
             E = city.load('simple_sidewalk_pednet_edges')
         odpt2V = city.load('odpt2node').set_index('odpt_id')
-        od = pd.read_pickle(city.root + od_fname + '.pickle')
+        od = pd.read_parquet(city.root / f'od_samples/{od_sample_id}.parquet')
         self.city = city
         self.name = name
         E = E.query(query) if isinstance(query, str) else E

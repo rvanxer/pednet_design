@@ -1,0 +1,28 @@
+od_samples:
+    City(Austin):
+        s1:
+            num_samples: 1000000
+            max_distance: 800
+            random_seed: 1234
+        s2:
+            num_samples: 5000000
+            max_distance: 800
+            random_seed: 786
+    City(Cambridge):
+        s1:
+            num_samples: 1000000
+            max_distance: 800
+            random_seed: 1234
+        s2:
+            num_samples: 5000000
+            max_distance: 800
+            random_seed: 786
+    City(Toronto):
+        s1:
+            num_samples: 1000000
+            max_distance: 800
+            random_seed: 1234
+        s2:
+            num_samples: 5000000
+            max_distance: 800
+            random_seed: 786
