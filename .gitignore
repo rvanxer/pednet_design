@@ -1,5 +1,8 @@
 .ipynb_checkpoints
 code/.ipynb_checkpoints
 code/_old
-data
+data/**/raw
+data/**/paths
+data/**/top_pn_paths
+data/_etc/us_counties.shp.parquet
 __pycache__
