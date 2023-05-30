@@ -5,4 +5,5 @@ data/**/raw
 data/**/paths
 data/**/top_pn_paths
 data/_etc/us_counties.shp.parquet
+fig
 __pycache__
